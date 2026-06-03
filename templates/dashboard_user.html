@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Customer — Co-Space Hub{% endblock %}
+{% block meta_desc %}Pesan ruangan coworking space favoritmu dengan mudah dan cepat di Co-Space Hub.{% endblock %}
+
+{% block content %}
+
+<!-- ======================================================
+     PAGE HEADER
+====================================================== -->
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-[#3E2723] tracking-tight">Selamat datang, {{ session.get('username') }} 👋</h1>
+    <p class="text-sm text-[#795548] mt-1">Pesan ruangan impianmu dan kelola riwayat booking di sini.</p>
+</div>
+
+<!-- ======================================================
+     STATS SUMMARY BAR
+====================================================== -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+
+    <!-- Total Booking -->
+    <div class="card flex items-center gap-4">
+        <div class="w-11 h-11 rounded-xl bg-[#EFEBE9] flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-[#8D6E63]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-[#3E2723]">{{ riwayat | length }}</p>
+            <p class="text-xs text-[#795548] font-medium">Total Booking</p>
+        </div>
+    </div>
+
+    <!-- Status Aktif (Booked) -->
+    <div class="card flex items-center gap-4">
+        <div class="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-[#3E2723]">
+                {{ riwayat | selectattr('status_booking', 'equalto', 'Booked') | list | length }}
+            </p>
+            <p class="text-xs text-[#795548] font-medium">Menunggu Konfirmasi</p>
+        </div>
+    </div>
+
+    <!-- Selesai (Done) -->
+    <div class="card flex items-center gap-4">
+        <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-[#3E2723]">
+                {{ riwayat | selectattr('status_booking', 'equalto', 'Done') | list | length }}
+            </p>
+            <p class="text-xs text-[#795548] font-medium">Selesai</p>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================
+     MAIN GRID: Booking Form + Room Catalog
+====================================================== -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+
+    <!-- ===== BOOKING FORM (Left / Wider) ===== -->
+    <div class="lg:col-span-3 card">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-8 h-8 bg-[#8D6E63] rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v16m8-8H4" />
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-base font-bold text-[#3E2723]">Buat Booking Baru</h2>
+                <p class="text-xs text-[#795548]">Isi form di bawah untuk memesan ruangan</p>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('dashboard_user') }}" id="form-booking" class="space-y-5">
+
+            <!-- Pilih Ruangan -->
+            <div>
+                <label for="id_ruangan" class="block text-sm font-semibold text-[#3E2723] mb-1.5">
+                    Pilih Ruangan
+                    <span class="text-red-400">*</span>
+                </label>
+                <div class="relative">
+                    <select id="id_ruangan" name="id_ruangan" required
+                        onchange="updateRoomInfo(this)"
+                        class="w-full appearance-none bg-[#FDFBF7] border border-[#EFEBE9] rounded-xl px-4 py-3 text-sm text-[#3E2723] focus:outline-none focus:ring-2 focus:ring-[#8D6E63] focus:border-transparent transition-all duration-200 pr-10">
+                        <option value="" disabled selected>-- Pilih ruangan --</option>
+                        {% set ns = namespace(current_type='') %}
+                        {% for r in ruangan_list %}
+                            {% if r.tipe_ruangan != ns.current_type %}
+                                {% if ns.current_type != '' %}
+                                </optgroup>
+                                {% endif %}
+                                <optgroup label="— {{ r.tipe_ruangan }} —">
+                                {% set ns.current_type = r.tipe_ruangan %}
+                            {% endif %}
+                            <option value="{{ r.id_ruangan }}"
+                                data-harga="{{ r.harga_per_jam }}"
+                                data-tipe="{{ r.tipe_ruangan }}"
+                                data-nama="{{ r.nama_ruangan }}">
+                                {{ r.nama_ruangan }} — Rp {{ '{:,.0f}'.format(r.harga_per_jam) }}/jam
+                            </option>
+                        {% endfor %}
+                        {% if ns.current_type != '' %}</optgroup>{% endif %}
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <svg class="w-4 h-4 text-[#795548]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room Info Preview Card -->
+            <div id="room-preview" class="hidden bg-[#EFEBE9] rounded-xl px-4 py-3 flex items-center gap-3 transition-all duration-300">
+                <div class="w-9 h-9 bg-[#8D6E63] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <div>
+                    <p id="preview-nama" class="text-sm font-bold text-[#3E2723]"></p>
+                    <p id="preview-tipe" class="text-xs text-[#795548]"></p>
+                </div>
+                <div class="ml-auto text-right">
+                    <p id="preview-harga" class="text-sm font-bold text-[#8D6E63]"></p>
+                    <p class="text-xs text-[#795548]">per jam</p>
+                </div>
+            </div>
+
+            <!-- Tanggal Sewa -->
+            <div>
+                <label for="tanggal_sewa" class="block text-sm font-semibold text-[#3E2723] mb-1.5">
+                    Tanggal Sewa
+                    <span class="text-red-400">*</span>
+                </label>
+                <input type="date" id="tanggal_sewa" name="tanggal_sewa" required
+                    class="w-full bg-[#FDFBF7] border border-[#EFEBE9] rounded-xl px-4 py-3 text-sm text-[#3E2723] focus:outline-none focus:ring-2 focus:ring-[#8D6E63] focus:border-transparent transition-all duration-200" />
+            </div>
+
+            <!-- Durasi Jam -->
+            <div>
+                <label for="durasi_jam" class="block text-sm font-semibold text-[#3E2723] mb-1.5">
+                    Durasi Sewa
+                    <span class="text-red-400">*</span>
+                </label>
+                <div class="relative">
+                    <input type="number" id="durasi_jam" name="durasi_jam" required
+                        min="1" max="24" placeholder="Masukkan durasi (jam)"
+                        oninput="updateTotalPreview()"
+                        class="w-full bg-[#FDFBF7] border border-[#EFEBE9] rounded-xl px-4 py-3 text-sm text-[#3E2723] focus:outline-none focus:ring-2 focus:ring-[#8D6E63] focus:border-transparent transition-all duration-200 pr-14" />
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-sm text-[#795548] font-medium pointer-events-none">Jam</span>
+                </div>
+            </div>
+
+            <!-- Total Bayar Preview -->
+            <div id="total-preview-box" class="hidden bg-[#3E2723] text-white rounded-xl px-5 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" />
+                    </svg>
+                    <span class="text-sm font-medium text-amber-100">Estimasi Total Bayar</span>
+                </div>
+                <p id="total-preview-value" class="text-lg font-bold text-amber-300"></p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="btn-book"
+                class="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 13l4 4L19 7" />
+                </svg>
+                Konfirmasi Booking
+            </button>
+        </form>
+    </div>
+
+    <!-- ===== ROOM CATALOG (Right / Narrower) ===== -->
+    <div class="lg:col-span-2 flex flex-col gap-4">
+        <div class="card flex-1">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 bg-[#EFEBE9] rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-[#8D6E63]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-[#3E2723]">Katalog Ruangan</h2>
+                    <p class="text-xs text-[#795548]">Daftar harga per jam</p>
+                </div>
+            </div>
+
+            <div class="space-y-2.5">
+                {% set ns2 = namespace(current_type='') %}
+                {% for r in ruangan_list %}
+                    {% if r.tipe_ruangan != ns2.current_type %}
+                        {% if ns2.current_type != '' %}
+                        <div class="pt-1"></div>
+                        {% endif %}
+                        <p class="text-[10px] font-bold text-[#795548] uppercase tracking-widest px-1 mt-3 mb-1">{{ r.tipe_ruangan }}</p>
+                        {% set ns2.current_type = r.tipe_ruangan %}
+                    {% endif %}
+
+                    <div class="flex items-center justify-between bg-[#FDFBF7] border border-[#EFEBE9] rounded-xl px-3.5 py-2.5 hover:border-[#8D6E63] hover:bg-[#EFEBE9] transition-all duration-150 cursor-pointer group"
+                         onclick="selectRoom('{{ r.id_ruangan }}')">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg
+                                {% if r.tipe_ruangan == 'Hot Desk' %}bg-sky-100 text-sky-600
+                                {% elif r.tipe_ruangan == 'Meeting Room' %}bg-violet-100 text-violet-600
+                                {% else %}bg-amber-100 text-amber-600{% endif %}
+                                flex items-center justify-center flex-shrink-0">
+                                {% if r.tipe_ruangan == 'Hot Desk' %}
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                {% elif r.tipe_ruangan == 'Meeting Room' %}
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                {% else %}
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                                {% endif %}
+                            </div>
+                            <span class="text-xs font-semibold text-[#3E2723] group-hover:text-[#3E2723]">{{ r.nama_ruangan }}</span>
+                        </div>
+                        <span class="text-xs font-bold text-[#8D6E63]">Rp {{ '{:,.0f}'.format(r.harga_per_jam) }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ======================================================
+     RIWAYAT BOOKING TABLE
+====================================================== -->
+<div class="card">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-[#EFEBE9] rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-[#8D6E63]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-base font-bold text-[#3E2723]">Riwayat Booking Saya</h2>
+                <p class="text-xs text-[#795548]">Semua transaksi booking yang pernah kamu buat</p>
+            </div>
+        </div>
+        <span class="text-xs font-semibold text-[#795548] bg-[#EFEBE9] rounded-full px-3 py-1">
+            {{ riwayat | length }} transaksi
+        </span>
+    </div>
+
+    {% if riwayat %}
+    <div class="overflow-x-auto -mx-6">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-[#FDFBF7]">
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-6 py-3 first:rounded-l-xl">#ID</th>
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Ruangan</th>
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Tipe</th>
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Tanggal</th>
+                    <th class="text-center text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Durasi</th>
+                    <th class="text-right text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Total Bayar</th>
+                    <th class="text-center text-xs font-bold text-[#795548] uppercase tracking-wider px-6 py-3 last:rounded-r-xl">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#EFEBE9]">
+                {% for b in riwayat %}
+                <tr class="hover:bg-[#FDFBF7] transition-colors duration-150 group">
+                    <td class="px-6 py-4">
+                        <span class="text-xs font-bold text-[#795548]">#{{ b.id_booking }}</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <p class="font-semibold text-[#3E2723]">{{ b.nama_ruangan }}</p>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="text-xs px-2.5 py-1 rounded-full font-medium
+                            {% if b.tipe_ruangan == 'Hot Desk' %}bg-sky-50 text-sky-700
+                            {% elif b.tipe_ruangan == 'Meeting Room' %}bg-violet-50 text-violet-700
+                            {% else %}bg-amber-50 text-amber-700{% endif %}">
+                            {{ b.tipe_ruangan }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <div class="flex items-center gap-1.5 text-[#3E2723]">
+                            <svg class="w-3.5 h-3.5 text-[#8D6E63]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span class="font-medium text-xs">{{ b.tanggal_sewa }}</span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-4 text-center">
+                        <span class="font-semibold text-[#3E2723] text-xs">{{ b.durasi_jam }} jam</span>
+                    </td>
+                    <td class="px-4 py-4 text-right">
+                        <span class="font-bold text-[#3E2723] text-sm">
+                            Rp {{ '{:,.0f}'.format(b.total_bayar) }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        {% if b.status_booking == 'Booked' %}
+                            <span class="badge-booked">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 inline-block"></span>
+                                Menunggu
+                            </span>
+                        {% elif b.status_booking == 'Done' %}
+                            <span class="badge-done">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 inline-block"></span>
+                                Selesai
+                            </span>
+                        {% elif b.status_booking == 'Cancelled' %}
+                            <span class="badge-cancelled">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 inline-block"></span>
+                                Dibatalkan
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="w-20 h-20 bg-[#EFEBE9] rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-10 h-10 text-[#8D6E63]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+        </div>
+        <p class="font-bold text-[#3E2723] text-base mb-1">Belum ada riwayat booking</p>
+        <p class="text-sm text-[#795548] max-w-xs">Yuk buat booking pertamamu menggunakan form di atas! Pilih ruangan dan tanggal yang kamu inginkan.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ======================================================
+     JAVASCRIPT
+====================================================== -->
+<script>
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('tanggal_sewa').setAttribute('min', today);
+
+    // Store harga for selected room
+    let selectedHarga = 0;
+
+    function updateRoomInfo(selectEl) {
+        const opt = selectEl.options[selectEl.selectedIndex];
+        if (!opt.value) return;
+
+        const nama   = opt.getAttribute('data-nama');
+        const tipe   = opt.getAttribute('data-tipe');
+        const harga  = parseFloat(opt.getAttribute('data-harga'));
+        selectedHarga = harga;
+
+        // Show preview card
+        const preview = document.getElementById('room-preview');
+        preview.classList.remove('hidden');
+        document.getElementById('preview-nama').textContent  = nama;
+        document.getElementById('preview-tipe').textContent  = tipe;
+        document.getElementById('preview-harga').textContent = 'Rp ' + harga.toLocaleString('id-ID');
+
+        updateTotalPreview();
+    }
+
+    function updateTotalPreview() {
+        const durasi = parseInt(document.getElementById('durasi_jam').value);
+        const box    = document.getElementById('total-preview-box');
+        const valEl  = document.getElementById('total-preview-value');
+
+        if (selectedHarga > 0 && !isNaN(durasi) && durasi > 0) {
+            const total = selectedHarga * durasi;
+            valEl.textContent = 'Rp ' + total.toLocaleString('id-ID');
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
+        }
+    }
+
+    // Click on catalog card to auto-select in dropdown
+    function selectRoom(id_ruangan) {
+        const sel = document.getElementById('id_ruangan');
+        for (let i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value == id_ruangan) {
+                sel.selectedIndex = i;
+                updateRoomInfo(sel);
+                // Scroll form into view smoothly
+                document.getElementById('form-booking').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                break;
+            }
+        }
+    }
+
+    // Prevent booking past dates
+    document.getElementById('form-booking').addEventListener('submit', function(e) {
+        const tanggal = document.getElementById('tanggal_sewa').value;
+        const durasi  = parseInt(document.getElementById('durasi_jam').value);
+
+        if (!tanggal || tanggal < today) {
+            e.preventDefault();
+            alert('Tanggal sewa tidak boleh di masa lalu!');
+            return;
+        }
+        if (isNaN(durasi) || durasi < 1) {
+            e.preventDefault();
+            alert('Durasi minimal 1 jam!');
+            return;
+        }
+    });
+</script>
+
+{% endblock %}

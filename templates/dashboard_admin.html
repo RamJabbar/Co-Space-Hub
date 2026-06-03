@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Resepsionis — Co-Space Hub{% endblock %}
+{% block meta_desc %}Kelola antrian booking dan update status pemakaian ruangan coworking space.{% endblock %}
+
+{% block content %}
+
+<!-- ======================================================
+     PAGE HEADER
+====================================================== -->
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-[#3E2723] tracking-tight">Manajemen Antrian Booking</h1>
+    <p class="text-sm text-[#795548] mt-1">Kelola semua pesanan masuk dan perbarui status pemakaian ruangan.</p>
+</div>
+
+
+<!-- ======================================================
+     STATS CARDS
+====================================================== -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+    <!-- Total Semua -->
+    <div class="card flex items-center gap-4">
+        <div class="w-11 h-11 rounded-xl bg-[#EFEBE9] flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-[#8D6E63]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-[#3E2723]">
+                {{ (counts.get('Booked', 0) + counts.get('Done', 0) + counts.get('Cancelled', 0)) }}
+            </p>
+            <p class="text-xs text-[#795548] font-medium">Total Semua</p>
+        </div>
+    </div>
+
+    <!-- Menunggu (Booked) -->
+    <div class="card flex items-center gap-4 border-l-4 border-l-amber-400">
+        <div class="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-[#3E2723]">{{ counts.get('Booked', 0) }}</p>
+            <p class="text-xs text-[#795548] font-medium">Menunggu Konfirmasi</p>
+        </div>
+    </div>
+
+    <!-- Selesai (Done) -->
+    <div class="card flex items-center gap-4 border-l-4 border-l-emerald-400">
+        <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-[#3E2723]">{{ counts.get('Done', 0) }}</p>
+            <p class="text-xs text-[#795548] font-medium">Selesai</p>
+        </div>
+    </div>
+
+    <!-- Dibatalkan (Cancelled) -->
+    <div class="card flex items-center gap-4 border-l-4 border-l-red-400">
+        <div class="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <div>
+            <p class="text-2xl font-bold text-[#3E2723]">{{ counts.get('Cancelled', 0) }}</p>
+            <p class="text-xs text-[#795548] font-medium">Dibatalkan</p>
+        </div>
+    </div>
+</div>
+
+
+<!-- ======================================================
+     MAIN BOOKING MANAGEMENT TABLE
+====================================================== -->
+<div class="card">
+
+    <!-- Table Header + Filter Pills -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-[#8D6E63] rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-base font-bold text-[#3E2723]">Daftar Antrian Booking</h2>
+                <p class="text-xs text-[#795548]">Klik tombol aksi untuk mengubah status pesanan</p>
+            </div>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="{{ url_for('dashboard_admin') }}"
+               id="filter-all"
+               class="text-xs font-semibold px-4 py-2 rounded-full border transition-all duration-200
+                      {% if filter_status == 'all' %}
+                          bg-[#3E2723] text-white border-[#3E2723]
+                      {% else %}
+                          bg-white text-[#795548] border-[#EFEBE9] hover:border-[#8D6E63] hover:text-[#8D6E63]
+                      {% endif %}">
+                Semua
+                <span class="ml-1 opacity-70">{{ counts.get('Booked', 0) + counts.get('Done', 0) + counts.get('Cancelled', 0) }}</span>
+            </a>
+            <a href="{{ url_for('dashboard_admin', status='Booked') }}"
+               id="filter-booked"
+               class="text-xs font-semibold px-4 py-2 rounded-full border transition-all duration-200
+                      {% if filter_status == 'Booked' %}
+                          bg-amber-500 text-white border-amber-500
+                      {% else %}
+                          bg-white text-[#795548] border-[#EFEBE9] hover:border-amber-400 hover:text-amber-600
+                      {% endif %}">
+                Menunggu
+                <span class="ml-1 opacity-70">{{ counts.get('Booked', 0) }}</span>
+            </a>
+            <a href="{{ url_for('dashboard_admin', status='Done') }}"
+               id="filter-done"
+               class="text-xs font-semibold px-4 py-2 rounded-full border transition-all duration-200
+                      {% if filter_status == 'Done' %}
+                          bg-emerald-500 text-white border-emerald-500
+                      {% else %}
+                          bg-white text-[#795548] border-[#EFEBE9] hover:border-emerald-400 hover:text-emerald-600
+                      {% endif %}">
+                Selesai
+                <span class="ml-1 opacity-70">{{ counts.get('Done', 0) }}</span>
+            </a>
+            <a href="{{ url_for('dashboard_admin', status='Cancelled') }}"
+               id="filter-cancelled"
+               class="text-xs font-semibold px-4 py-2 rounded-full border transition-all duration-200
+                      {% if filter_status == 'Cancelled' %}
+                          bg-red-400 text-white border-red-400
+                      {% else %}
+                          bg-white text-[#795548] border-[#EFEBE9] hover:border-red-300 hover:text-red-500
+                      {% endif %}">
+                Dibatalkan
+                <span class="ml-1 opacity-70">{{ counts.get('Cancelled', 0) }}</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Table -->
+    {% if bookings %}
+    <div class="overflow-x-auto -mx-6">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-[#FDFBF7]">
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-6 py-3">#ID</th>
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Customer</th>
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Ruangan</th>
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Tipe</th>
+                    <th class="text-left text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Tanggal Sewa</th>
+                    <th class="text-center text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Durasi</th>
+                    <th class="text-right text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Total Bayar</th>
+                    <th class="text-center text-xs font-bold text-[#795548] uppercase tracking-wider px-4 py-3">Status</th>
+                    <th class="text-center text-xs font-bold text-[#795548] uppercase tracking-wider px-6 py-3">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#EFEBE9]">
+                {% for b in bookings %}
+                <tr class="hover:bg-[#FDFBF7] transition-colors duration-150 group" id="row-{{ b.id_booking }}">
+
+                    <!-- ID -->
+                    <td class="px-6 py-4">
+                        <span class="text-xs font-bold text-[#795548]">#{{ b.id_booking }}</span>
+                    </td>
+
+                    <!-- Customer -->
+                    <td class="px-4 py-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-[#EFEBE9] flex items-center justify-center text-[#8D6E63] font-bold text-xs flex-shrink-0 uppercase">
+                                {{ b.username[0] }}
+                            </div>
+                            <span class="font-semibold text-[#3E2723] text-sm">{{ b.username }}</span>
+                        </div>
+                    </td>
+
+                    <!-- Ruangan -->
+                    <td class="px-4 py-4">
+                        <p class="font-semibold text-[#3E2723]">{{ b.nama_ruangan }}</p>
+                    </td>
+
+                    <!-- Tipe Ruangan -->
+                    <td class="px-4 py-4">
+                        <span class="text-xs px-2.5 py-1 rounded-full font-medium
+                            {% if b.tipe_ruangan == 'Hot Desk' %}bg-sky-50 text-sky-700
+                            {% elif b.tipe_ruangan == 'Meeting Room' %}bg-violet-50 text-violet-700
+                            {% else %}bg-amber-50 text-amber-700{% endif %}">
+                            {{ b.tipe_ruangan }}
+                        </span>
+                    </td>
+
+                    <!-- Tanggal -->
+                    <td class="px-4 py-4">
+                        <div class="flex items-center gap-1.5 text-[#3E2723]">
+                            <svg class="w-3.5 h-3.5 text-[#8D6E63] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span class="font-medium text-xs">{{ b.tanggal_sewa }}</span>
+                        </div>
+                    </td>
+
+                    <!-- Durasi -->
+                    <td class="px-4 py-4 text-center">
+                        <span class="font-semibold text-[#3E2723] text-xs">{{ b.durasi_jam }} jam</span>
+                    </td>
+
+                    <!-- Total Bayar -->
+                    <td class="px-4 py-4 text-right">
+                        <span class="font-bold text-[#3E2723] text-sm">
+                            Rp {{ '{:,.0f}'.format(b.total_bayar) }}
+                        </span>
+                    </td>
+
+                    <!-- Status Badge -->
+                    <td class="px-4 py-4 text-center">
+                        {% if b.status_booking == 'Booked' %}
+                            <span class="badge-booked">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 inline-block animate-pulse"></span>
+                                Booked
+                            </span>
+                        {% elif b.status_booking == 'Done' %}
+                            <span class="badge-done">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 inline-block"></span>
+                                Done
+                            </span>
+                        {% elif b.status_booking == 'Cancelled' %}
+                            <span class="badge-cancelled">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 inline-block"></span>
+                                Cancelled
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Aksi Buttons -->
+                    <td class="px-6 py-4 text-center">
+                        {% if b.status_booking == 'Booked' %}
+                        <div class="flex items-center justify-center gap-2">
+                            <!-- Tombol Selesai -->
+                            <button type="button"
+                                onclick="openConfirmModal('{{ b.id_booking }}', 'Done')"
+                                id="btn-done-{{ b.id_booking }}"
+                                class="btn-success flex items-center gap-1.5 text-xs px-3 py-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Selesai
+                            </button>
+
+                            <!-- Tombol Batalkan -->
+                            <button type="button"
+                                onclick="openConfirmModal('{{ b.id_booking }}', 'Cancelled')"
+                                id="btn-cancel-{{ b.id_booking }}"  
+                                class="btn-danger flex items-center gap-1.5 text-xs px-3 py-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Batalkan
+                            </button>
+                        </div>
+                        {% else %}
+                        <span class="text-xs text-[#795548] italic font-medium">— Final —</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-20 h-20 bg-[#EFEBE9] rounded-2xl flex items-center justify-center mb-4">
+            <svg class="w-10 h-10 text-[#8D6E63]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+        </div>
+        <p class="font-bold text-[#3E2723] text-base mb-1">
+            {% if filter_status == 'all' %}
+                Belum ada data booking
+            {% else %}
+                Tidak ada booking dengan status "{{ filter_status }}"
+            {% endif %}
+        </p>
+        <p class="text-sm text-[#795548] max-w-xs">
+            {% if filter_status == 'all' %}
+                Data booking dari customer akan muncul di sini secara otomatis.
+            {% else %}
+                Coba ubah filter untuk melihat data dengan status lain.
+            {% endif %}
+        </p>
+        {% if filter_status != 'all' %}
+        <a href="{{ url_for('dashboard_admin') }}"
+           class="mt-4 text-xs font-semibold text-[#8D6E63] hover:text-[#6D4C41] underline underline-offset-2 transition-colors">
+            Lihat semua booking →
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+
+<!-- ======================================================
+     CONFIRMATION MODAL (Overlay)
+====================================================== -->
+<div id="confirm-modal"
+     class="fixed inset-0 z-50 hidden flex items-center justify-center p-4"
+     role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <!-- Backdrop -->
+    <div id="modal-backdrop"
+         class="absolute inset-0 bg-[#3E2723]/40 backdrop-blur-sm"
+         onclick="closeConfirmModal()"></div>
+
+    <!-- Modal Box -->
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 z-10
+                transform transition-all duration-300 scale-95 opacity-0" id="modal-box">
+
+        <!-- Icon -->
+        <div id="modal-icon-done" class="hidden w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <div id="modal-icon-cancel" class="hidden w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </div>
+
+        <!-- Text -->
+        <h3 id="modal-title" class="text-base font-bold text-[#3E2723] text-center mb-2"></h3>
+        <p id="modal-desc" class="text-sm text-[#795548] text-center mb-6 leading-relaxed"></p>
+
+        <!-- Actions -->
+        <div class="flex gap-3">
+            <button type="button" onclick="closeConfirmModal()"
+                class="flex-1 bg-[#FDFBF7] border border-[#EFEBE9] text-[#795548] hover:bg-[#EFEBE9] font-semibold text-sm px-4 py-2.5 rounded-xl transition-all duration-200">
+                Batal
+            </button>
+            <!-- Hidden form that gets submitted on confirm -->
+            <form id="confirm-form" method="POST" class="flex-1">
+                <input type="hidden" name="new_status" id="modal-new-status" value="">
+                <button type="submit" id="modal-confirm-btn"
+                    class="w-full font-semibold text-sm px-4 py-2.5 rounded-xl transition-all duration-200 text-white">
+                    Ya, Konfirmasi
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ======================================================
+     JAVASCRIPT
+====================================================== -->
+<script>
+    // --- Confirm Modal Logic ---
+    function openConfirmModal(bookingId, newStatus) {
+        const modal     = document.getElementById('confirm-modal');
+        const box       = document.getElementById('modal-box');
+        const form      = document.getElementById('confirm-form');
+        const statusIn  = document.getElementById('modal-new-status');
+        const title     = document.getElementById('modal-title');
+        const desc      = document.getElementById('modal-desc');
+        const confirmBtn= document.getElementById('modal-confirm-btn');
+        const iconDone  = document.getElementById('modal-icon-done');
+        const iconCancel= document.getElementById('modal-icon-cancel');
+
+        form.action = "/dashboard/admin/update/" + bookingId;
+        statusIn.value = newStatus;
+
+        if (newStatus === 'Done') {
+            title.textContent = 'Tandai Selesai?';
+            desc.textContent  = `Booking #${bookingId} akan ditandai sebagai "Selesai". Transaksi ini akan masuk ke rekap pendapatan. Tindakan ini tidak dapat dibatalkan.`;
+            confirmBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
+            confirmBtn.classList.remove('bg-red-400', 'hover:bg-red-500');
+            iconDone.classList.remove('hidden');
+            iconDone.classList.add('flex');
+            iconCancel.classList.add('hidden');
+            iconCancel.classList.remove('flex');
+        } else {
+            title.textContent = 'Batalkan Booking?';
+            desc.textContent  = `Booking #${bookingId} akan dibatalkan. Transaksi ini tidak akan masuk ke laporan pendapatan. Tindakan ini tidak dapat dibatalkan.`;
+            confirmBtn.classList.add('bg-red-400', 'hover:bg-red-500');
+            confirmBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+            iconCancel.classList.remove('hidden');
+            iconCancel.classList.add('flex');
+            iconDone.classList.add('hidden');
+            iconDone.classList.remove('flex');
+        }
+
+        // Show modal with animation
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            });
+        });
+    }
+
+    function closeConfirmModal() {
+        const modal = document.getElementById('confirm-modal');
+        const box   = document.getElementById('modal-box');
+        box.classList.remove('scale-100', 'opacity-100');
+        box.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 250);
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeConfirmModal();
+    });
+</script>
+
+{% endblock %}

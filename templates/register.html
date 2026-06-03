@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar Akun - Co-Space Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#FDFBF7',
+                        brown: {
+                            50: '#EFEBE9',
+                            100: '#D7CCC8',
+                            200: '#BCAAA4',
+                            400: '#8D6E63',
+                            500: '#795548',
+                            600: '#6D4C41',
+                            800: '#4E342E',
+                            900: '#3E2723',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #FDFBF7 0%, #F5F0EB 100%);
+        }
+
+        .input-field {
+            @apply w-full px-4 py-3 bg-white border border-[#EFEBE9] text-[#3E2723] rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8D6E63] focus:border-transparent transition-all duration-200;
+        }
+
+        .btn-register {
+            @apply w-full bg-[#8D6E63] hover:bg-[#6D4C41] text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105;
+        }
+
+        .card {
+            @apply bg-white rounded-2xl shadow-xl p-8;
+        }
+
+        .link-text {
+            @apply text-sm text-[#795548] hover:text-[#8D6E63] font-medium transition-colors underline underline-offset-2;
+        }
+    </style>
+</head>
+
+<body class="gradient-bg min-h-screen flex items-center justify-center">
+
+    <div class="w-full max-w-md px-4">
+        <!-- Back to Home Link -->
+        <a href="{{ url_for('landing') }}" class="inline-flex items-center gap-2 text-[#8D6E63] hover:text-[#6D4C41] font-medium text-sm mb-8 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kembali ke Beranda
+        </a>
+
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-[#8D6E63] rounded-2xl shadow-lg mb-5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-[#3E2723] mb-2">Buat Akun</h1>
+            <p class="text-[#795548] text-sm font-medium">Daftar sebagai customer Co-Space Hub</p>
+        </div>
+
+        <!-- Register Form Card -->
+        <div class="card">
+            <h2 class="text-2xl font-bold text-[#3E2723] mb-6 text-center">Daftar Akun Baru</h2>
+
+            <!-- Error Alert -->
+            {% if error %}
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-sm flex gap-3">
+                <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clip-rule="evenodd" />
+                </svg>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Form -->
+            <form method="POST" action="{{ url_for('register') }}" class="space-y-5">
+
+                <!-- Username Field -->
+                <div>
+                    <label for="username" class="block text-sm font-semibold text-[#3E2723] mb-2">Username
+                        <span class="text-red-400">*</span>
+                    </label>
+                    <input type="text" id="username" name="username" required minlength="3"
+                        placeholder="Masukkan username (minimal 3 karakter)" class="input-field" />
+                    <p class="text-xs text-[#795548] mt-1">Username harus unik dan minimal 3 karakter.</p>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="password" class="block text-sm font-semibold text-[#3E2723] mb-2">Password
+                        <span class="text-red-400">*</span>
+                    </label>
+                    <input type="password" id="password" name="password" required minlength="6"
+                        placeholder="Masukkan password (minimal 6 karakter)" class="input-field" />
+                    <p class="text-xs text-[#795548] mt-1">Password minimal 6 karakter untuk keamanan.</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-register mt-6">
+                    Daftar Sekarang
+                </button>
+
+            </form>
+
+            <!-- Info Teks -->
+            <div class="mt-8 pt-6 border-t border-[#EFEBE9]">
+                <p class="text-xs text-[#795548] font-medium text-center mb-3">Informasi Penting:</p>
+                <p class="text-xs text-gray-600 text-center leading-relaxed">
+                    Dengan mendaftar, Anda membuat akun sebagai <strong>Customer</strong> dan dapat langsung memesan ruangan coworking space di Co-Space Hub.
+                </p>
+            </div>
+
+            <!-- Back to Login Link -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-[#795548]">
+                    Sudah punya akun?
+                    <a href="{{ url_for('login') }}" class="link-text">
+                        Masuk di sini →
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-xs text-[#795548] mt-6">© 2026 Co-Space Hub. Semua hak dilindungi.</p>
+
+    </div>
+
+</body>
+
+</html>

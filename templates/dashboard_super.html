@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Analitik Bisnis - Co-Space Hub{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-[#3E2723] mb-2">Dashboard Analitik Bisnis</h1>
+    <p class="text-[#795548]">Pantau performa bisnis Co-Space Hub secara real-time</p>
+</div>
+
+<!-- Top Stats Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+    <!-- Total Omset -->
+    <div class="card">
+        <div class="flex items-start justify-between mb-3">
+            <h3 class="text-[#795548] font-medium text-sm">Total Omset Pendapatan</h3>
+            <div class="p-2 bg-emerald-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+        <p class="text-3xl font-bold text-[#3E2723] mb-1">Rp {{ "{:,.0f}".format(total_omset) }}</p>
+        <p class="text-xs text-[#795548]">Dari transaksi yang diselesaikan</p>
+    </div>
+
+    <!-- Total Booking -->
+    <div class="card">
+        <div class="flex items-start justify-between mb-3">
+            <h3 class="text-[#795548] font-medium text-sm">Total Pemesanan</h3>
+            <div class="p-2 bg-blue-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            </div>
+        </div>
+        <p class="text-3xl font-bold text-[#3E2723] mb-1">{{ total_booking }}</p>
+        <p class="text-xs text-[#795548]">Semua status booking</p>
+    </div>
+
+    <!-- Completed Booking -->
+    <div class="card">
+        <div class="flex items-start justify-between mb-3">
+            <h3 class="text-[#795548] font-medium text-sm">Booking Selesai</h3>
+            <div class="p-2 bg-emerald-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+        </div>
+        <p class="text-3xl font-bold text-[#3E2723] mb-1">{{ total_done }}</p>
+        <p class="text-xs text-[#795548]">Status 'Done' (Selesai)</p>
+    </div>
+
+    <!-- Pending Booking -->
+    <div class="card">
+        <div class="flex items-start justify-between mb-3">
+            <h3 class="text-[#795548] font-medium text-sm">Menunggu Konfirmasi</h3>
+            <div class="p-2 bg-amber-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-600" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+        <p class="text-3xl font-bold text-[#3E2723] mb-1">{{ total_booked }}</p>
+        <p class="text-xs text-[#795548]">Status 'Booked'</p>
+    </div>
+
+</div>
+
+<!-- Recent Transactions Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+    <!-- Cancelled Count Card -->
+    <div class="card">
+        <h3 class="font-semibold text-[#3E2723] mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 14l-2-2m0 0l-2-2m2 2l2-2m-2 2l-2 2" />
+            </svg>
+            Booking Dibatalkan
+        </h3>
+        <p class="text-4xl font-bold text-red-600 mb-2">{{ total_cancelled }}</p>
+        <p class="text-xs text-[#795548]">Status 'Cancelled' transaksi</p>
+    </div>
+
+    <!-- Conversion Rate -->
+    <div class="card">
+        <h3 class="font-semibold text-[#3E2723] mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#8D6E63]" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 7h8m0 0v8m0-8L5.257 18.257" />
+            </svg>
+            Tingkat Konversi
+        </h3>
+        {% if total_booking > 0 %}
+        <p class="text-4xl font-bold text-[#8D6E63] mb-2">
+            {{ "{:.1f}".format((total_done / total_booking) * 100) }}%
+        </p>
+        {% else %}
+        <p class="text-4xl font-bold text-[#8D6E63] mb-2">0%</p>
+        {% endif %}
+        <p class="text-xs text-[#795548]">Booking yang diselesaikan</p>
+    </div>
+
+    <!-- Avg Transaction -->
+    <div class="card">
+        <h3 class="font-semibold text-[#3E2723] mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Rata-rata Transaksi
+        </h3>
+        {% if total_done > 0 %}
+        <p class="text-4xl font-bold text-purple-600 mb-2">
+            Rp {{ "{:,.0f}".format(total_omset / total_done) }}
+        </p>
+        {% else %}
+        <p class="text-4xl font-bold text-purple-600 mb-2">Rp 0</p>
+        {% endif %}
+        <p class="text-xs text-[#795548]">Per transaksi selesai</p>
+    </div>
+
+</div>
+
+<!-- Recent Done Transactions Table -->
+<div class="card">
+    <h2 class="text-xl font-bold text-[#3E2723] mb-5 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Transaksi Terbaru (Status Done)
+    </h2>
+
+    {% if recent_done %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-[#EFEBE9] bg-[#FDFBF7]">
+                    <th class="text-left px-4 py-3 font-semibold text-[#3E2723]">ID Booking</th>
+                    <th class="text-left px-4 py-3 font-semibold text-[#3E2723]">Customer</th>
+                    <th class="text-left px-4 py-3 font-semibold text-[#3E2723]">Ruangan</th>
+                    <th class="text-left px-4 py-3 font-semibold text-[#3E2723]">Tanggal</th>
+                    <th class="text-right px-4 py-3 font-semibold text-[#3E2723]">Total Bayar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trx in recent_done %}
+                <tr class="border-b border-[#EFEBE9] hover:bg-[#FDFBF7] transition-colors">
+                    <td class="px-4 py-3 font-medium text-[#3E2723]">#{{ trx.id_booking }}</td>
+                    <td class="px-4 py-3 text-[#795548]">{{ trx.username }}</td>
+                    <td class="px-4 py-3 text-[#795548]">{{ trx.nama_ruangan }}</td>
+                    <td class="px-4 py-3 text-[#795548]">{{ trx.tanggal_sewa }}</td>
+                    <td class="px-4 py-3 text-right font-semibold text-emerald-600">
+                        Rp {{ "{:,.0f}".format(trx.total_bayar) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-[#EFEBE9] mb-4" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4M7 12a5 5 0 1110 0 5 5 0 01-10 0z" />
+        </svg>
+        <p class="text-[#795548] font-medium">Belum ada transaksi yang diselesaikan</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

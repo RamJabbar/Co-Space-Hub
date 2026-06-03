@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Co-Space Hub - Tempat Kerja Bersama Modern</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#FDFBF7',
+                        brown: {
+                            50: '#EFEBE9',
+                            100: '#D7CCC8',
+                            200: '#BCAAA4',
+                            400: '#8D6E63',
+                            500: '#795548',
+                            600: '#6D4C41',
+                            800: '#4E342E',
+                            900: '#3E2723',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-hero {
+            background: linear-gradient(135deg, #FDFBF7 0%, #F5F0EB 50%, #EFEBE9 100%);
+        }
+
+        .btn-primary {
+            @apply bg-[#8D6E63] hover:bg-[#6D4C41] text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105;
+        }
+
+        .btn-secondary {
+            @apply border-2 border-[#8D6E63] text-[#8D6E63] hover:bg-[#8D6E63] hover:text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200;
+        }
+
+        .facility-card {
+            @apply bg-white rounded-2xl shadow-sm border border-[#EFEBE9] p-8 hover:shadow-lg hover:border-[#8D6E63] transition-all duration-300 transform hover:-translate-y-1;
+        }
+
+        .feature-icon {
+            @apply w-16 h-16 bg-[#EFEBE9] rounded-2xl flex items-center justify-center mb-4;
+        }
+    </style>
+</head>
+
+<body class="gradient-hero min-h-screen">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="bg-white shadow-sm border-b border-[#EFEBE9] sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#8D6E63] rounded-xl flex items-center justify-center shadow">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-bold text-[#3E2723] text-lg">Co-Space Hub</p>
+                    <p class="text-xs text-[#795548]">Coworking Management</p>
+                </div>
+            </div>
+
+            <!-- Sign In Button -->
+            <a href="{{ url_for('login') }}" class="btn-primary text-sm">
+                Sign In
+            </a>
+        </div>
+    </nav>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="max-w-7xl mx-auto px-6 py-24">
+        <div class="text-center mb-16">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 bg-[#8D6E63] bg-opacity-10 border border-[#8D6E63] border-opacity-30 rounded-full px-4 py-2 mb-6">
+                <span class="w-2 h-2 bg-[#8D6E63] rounded-full animate-pulse"></span>
+                <span class="text-sm font-semibold text-[#8D6E63]">Mulai Hari Ini</span>
+            </div>
+
+            <!-- Headline -->
+            <h1 class="text-5xl md:text-6xl font-bold text-[#3E2723] mb-6 leading-tight">
+                Tempat Kerja Impianmu, 
+                <span class="text-[#8D6E63]">Dijamin Produktif</span>
+            </h1>
+
+            <!-- Subheadline -->
+            <p class="text-lg text-[#795548] max-w-2xl mx-auto mb-10 leading-relaxed">
+                Nikmati suasana kerja yang nyaman, modern, dan penuh inspirasi. 
+                Booking ruangan coworking favoritmu dengan mudah dan cepat di Co-Space Hub.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{{ url_for('register') }}" class="btn-primary">
+                    Daftar Sekarang
+                </a>
+                <a href="{{ url_for('login') }}" class="btn-secondary">
+                    Sudah Punya Akun? Masuk
+                </a>
+            </div>
+        </div>
+
+        <!-- Hero Image Placeholder -->
+        <div class="mt-16 relative">
+            <div class="aspect-video bg-white rounded-3xl shadow-xl border border-[#EFEBE9] overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#EFEBE9] to-[#D7CCC8]">
+                    <div class="text-center">
+                        <img src="static/gambar/ruang kerja.jpg"
+                                alt="Ruang Kerja kolaboratif"
+                            class="w-full h-full obejct-cover center">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FACILITIES SECTION ===== -->
+    <section class="bg-white py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-[#3E2723] mb-4">Fasilitas Unggulan Kami</h2>
+                <p class="text-lg text-[#795548]">Lengkap dengan semua yang Anda butuhkan untuk bekerja maksimal</p>
+            </div>
+
+            <!-- 3 Column Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <!-- Facility 1: Hot Desk -->
+                <div class="facility-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#8D6E63]" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#3E2723] mb-3">Hot Desk</h3>
+                    <p class="text-[#795548] leading-relaxed mb-4">
+                        Meja kerja fleksibel dengan koneksi WiFi super cepat. Cocok untuk freelancer dan remote worker.
+                    </p>
+                    <div class="text-[#8D6E63] font-semibold text-sm">
+                        Mulai dari Rp 25.000/jam
+                    </div>
+                </div>
+
+                <!-- Facility 2: Meeting Room -->
+                <div class="facility-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#8D6E63]" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#3E2723] mb-3">Meeting Room</h3>
+                    <p class="text-[#795548] leading-relaxed mb-4">
+                        Ruangan rapat profesional dengan proyektor dan whiteboard lengkap. Sempurna untuk presentasi dan diskusi tim.
+                    </p>
+                    <div class="text-[#8D6E63] font-semibold text-sm">
+                        Mulai dari Rp 75.000/jam
+                    </div>
+                </div>
+
+                <!-- Facility 3: Private Office -->
+                <div class="facility-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#8D6E63]" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#3E2723] mb-3">Private Office</h3>
+                    <p class="text-[#795548] leading-relaxed mb-4">
+                        Kantor pribadi eksklusif dengan privasi maksimal. Ideal untuk startup, tim kecil, atau klien VIP.
+                    </p>
+                    <div class="text-[#8D6E63] font-semibold text-sm">
+                        Mulai dari Rp 150.000/jam
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== BENEFITS SECTION ===== -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-[#3E2723] mb-4">Mengapa Pilih Co-Space Hub?</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#EFEBE9] flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#8D6E63]" fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-[#3E2723] mb-2">Lokasi Strategis</h3>
+                        <p class="text-[#795548]">Terletak di pusat kota dengan akses mudah dari berbagai transportasi publik.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#EFEBE9] flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#8D6E63]" fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM9 12a6 6 0 11-12 0 6 6 0 0112 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-[#3E2723] mb-2">Komunitas Profesional</h3>
+                        <p class="text-[#795548]">Bertemu dengan profesional lain dan bangun jaringan bisnis yang berharga.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#EFEBE9] flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#8D6E63]" fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-[#3E2723] mb-2">Booking Fleksibel</h3>
+                        <p class="text-[#795548]">Pesan ruangan sesuai kebutuhan Anda, per jam, per hari, atau per bulan.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#EFEBE9] flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#8D6E63]" fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.488 5.951 1.488a1 1 0 001.169-1.409l-7-14z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-[#3E2723] mb-2">Teknologi Terkini</h3>
+                        <p class="text-[#795548]">WiFi ultra-cepat, printer, AC, dan semua perangkat kantor modern tersedia.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA SECTION ===== -->
+    <section class="bg-[#8D6E63] py-20">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold text-white mb-4">Siap Mulai Bekerja Produktif?</h2>
+            <p class="text-lg text-[#EFEBE9] mb-8 leading-relaxed">
+                Daftar sekarang dan dapatkan akses ke ruang kerja terbaik dengan harga terjangkau. 
+                Tidak perlu biaya tersembunyi, semua transparan!
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{{ url_for('register') }}"
+                    class="bg-white text-[#8D6E63] hover:bg-[#EFEBE9] font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg">
+                    Daftar Akun Gratis
+                </a>
+                <a href="{{ url_for('login') }}"
+                    class="border-2 border-white text-white hover:bg-white hover:text-[#8D6E63] font-semibold px-8 py-4 rounded-xl transition-all duration-200">
+                    Masuk ke Akun
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-white border-t border-[#EFEBE9]">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-8">
+                <!-- Company Info -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-[#8D6E63] rounded-xl flex items-center justify-center shadow">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </div>
+                        <p class="font-bold text-[#3E2723]">Co-Space Hub</p>
+                    </div>
+                    <p class="text-sm text-[#795548]">Platform manajemen dan pemesanan tempat kerja bersama yang modern dan terpercaya.</p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-bold text-[#3E2723] mb-4">Menu Cepat</h4>
+                    <ul class="space-y-2 text-sm text-[#795548]">
+                        <li><a href="{{ url_for('landing') }}" class="hover:text-[#8D6E63] transition-colors">Beranda</a></li>
+                        <li><a href="{{ url_for('register') }}" class="hover:text-[#8D6E63] transition-colors">Daftar</a></li>
+                        <li><a href="{{ url_for('login') }}" class="hover:text-[#8D6E63] transition-colors">Masuk</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="font-bold text-[#3E2723] mb-4">Hubungi Kami</h4>
+                    <div class="space-y-2 text-sm text-[#795548]">
+                        <p>📍 Jl. Jakarta No. 123, Kota Besar</p>
+                        <p>📞 +62 (0) 812-3456-7890</p>
+                        <p>✉️ info@cospachub.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-[#EFEBE9] pt-8 text-center text-sm text-[#795548]">
+                <p>© 2026 Co-Space Hub. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
