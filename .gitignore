@@ -1,0 +1,10 @@
+# Mengabaikan file database lokal agar tidak konflik di GitHub
+database.db
+*.db
+
+# Mengabaikan cache Python
+__pycache__/
+*.pyc
+
+# Mengabaikan settingan lokal VS Code
+.vscode/
