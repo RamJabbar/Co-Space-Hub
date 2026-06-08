@@ -10,7 +10,11 @@ app = Flask(__name__)
 app.secret_key = "cospace_hub_secret_key_pas_2024"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE = os.path.join(BASE_DIR, "database.db")
+if os.environ.get("VERCEL"):
+    DATABASE = os.path.join("/tmp", "database.db")
+else:
+    DATABASE = os.path.join(BASE_DIR, "database.db")
+
 
 # ---------------------------------------------------------------------------
 # Database Helpers
